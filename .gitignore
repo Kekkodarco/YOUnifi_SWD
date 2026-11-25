@@ -35,5 +35,9 @@ build/
 .vscode/
 
 
+### Node / Frontend ###
+node_modules/
+
+
 ### ENV files ###
 .env
