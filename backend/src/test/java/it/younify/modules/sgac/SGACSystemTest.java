@@ -1,6 +1,8 @@
 package it.younify.modules.sgac;
 
 import tools.jackson.databind.ObjectMapper;
+import it.younify.modules.sgac.adapter.PIVAlidator.PIVAlidator;
+import it.younify.modules.sgac.adapter.emailsender.EmailProvider;
 import it.younify.modules.sgac.model.dto.request.HostSignUpRequest;
 import it.younify.modules.sgac.model.dto.request.UserSignUpRequest;
 import it.younify.modules.sgac.model.entity.User;
@@ -12,12 +14,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -42,6 +46,12 @@ class SGACSystemTest {
     @Autowired
     private Code2FARepository code2FARepository;
 
+    @MockitoBean
+    private EmailProvider emailProvider;
+
+    @MockitoBean
+    private PIVAlidator pivalidator;
+
     //TC16_UR_SGAC - Happy Path
     @Test
     void systemTest_UserSignUp_FullFlow() throws Exception {
@@ -53,7 +63,7 @@ class SGACSystemTest {
                 .password("PasswordSicura1!")
                 .confirmPassword("PasswordSicura1!")
                 .university("Università degli Studi di Salerno")
-                .cdl("Scienze e tecnologie informatiche")
+                .cdl("L-31: Scienze e tecnologie informatiche")
                 .dateOfBirth(LocalDate.of(2000, 1, 1))
                 .contactsInfo("instagram.com/systemtest")
                 .build();
@@ -79,6 +89,7 @@ class SGACSystemTest {
     // TC17_H_SGAC - Happy Path
     @Test
     void systemTest_HostSignUp_FullFlow() throws Exception {
+        when(pivalidator.PIVAlidatePEC("12485671007")).thenReturn("openapi@legalmail.it");
 
         HostSignUpRequest request = HostSignUpRequest.builder()
                 .hostName("Bar Sistema")

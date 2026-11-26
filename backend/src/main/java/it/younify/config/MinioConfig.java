@@ -27,6 +27,9 @@ public class MinioConfig {
     @Value("${minio.bucket-name}")
     private String bucketName;
 
+    @Value("${minio.enabled:true}")
+    private boolean minioEnabled;
+
     /**
      * Creates and configures the {@link MinioClient} bean.
      * <p>
@@ -45,6 +48,10 @@ public class MinioConfig {
                 .endpoint(url)
                 .credentials(accessKey, secretKey)
                 .build();
+
+        if (!minioEnabled) {
+            return client;
+        }
 
         try {
 

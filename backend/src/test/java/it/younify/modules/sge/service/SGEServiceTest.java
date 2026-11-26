@@ -86,6 +86,7 @@ class SGEServiceTest {
         when(imageStorageService.uploadImage(eq(poster), anyString(), anyString()))
                 .thenReturn("events/fake-image.webp");
         when(censorshipService.containsSensitiveContent(anyString())).thenReturn(false);
+        when(geoValidationService.isValidCityOnly("Fisciano")).thenReturn(true);
 
         eventPostService.post(validRequest);
 

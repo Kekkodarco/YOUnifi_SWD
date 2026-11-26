@@ -1,6 +1,7 @@
 package it.younify.modules.sge;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import it.younify.core.service.ImageStorageService;
 import it.younify.modules.sgac.model.entity.Host;
 import it.younify.modules.sgac.model.entity.Role; // Assicurati di importare l'enum Role
 import it.younify.modules.sgac.repository.HostRepository;
@@ -15,6 +16,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder; // Import necessario
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +26,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf; // Import CSRF
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -44,6 +48,9 @@ class SGESystemTest {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private JwtService jwtService;
+
+    @MockitoBean
+    private ImageStorageService imageStorageService;
 
     private Host host;
     private Cookie authCookie;
@@ -75,6 +82,7 @@ class SGESystemTest {
     // TC9_SGE: Creazione Evento con successo -> [OK]
     @Test
     void systemTest_TC9_CreateEvent_Success() throws Exception {
+        when(imageStorageService.uploadImage(any(), any(), any())).thenReturn("uploads/events/test-poster.webp");
 
         String futureDate = Instant.now().plus(20, ChronoUnit.DAYS).toString();
 
